@@ -4,4 +4,4 @@ The Robotics werenfridus group uploads all code and instructions on here for you
 
 Current code languages and services used in our projects:
 
-[![Current code languages and services used in our project:](https://roboticawerenfridus.nl/services/logos.svg)](https://roboticawerenfridus.nl)
+[![Current code languages and services used in our project:](https://roboticawerenfridus.nl/services)](https://roboticawerenfridus.nl)
