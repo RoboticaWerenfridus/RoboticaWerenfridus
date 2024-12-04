@@ -14,4 +14,4 @@ How it's categorized:
 
 Current code languages and services used for the club and code:
 
-[![Current code languages and services used in our project:](https://roboticawerenfridus.nl/services/logos.svg)](https://roboticawerenfridus.nl)
+[![Current code languages and services used in our project:](https://mail.roboticawerenfridus.nl/logos.svg)](https://roboticawerenfridus.nl)
