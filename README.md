@@ -1,6 +1,6 @@
 ## Hi there 
 Welcome to our github profile! 
-The Robotics werenfridus group uploads all code and instructions on here for you to download for your robot!
+The Robotics Werenfridus group uploads all code and instructions on here for you to download for your robot!
 
 How it's categorized:
 
