@@ -1,5 +1,4 @@
 ## Welcome!
-Welcome to our github!
 
 Here we store all code for our **robotics-wf**! Check out **more info** at https://roboticawerenfridus.nl/! Interested in our documentation? Check out https://docs.roboticawerenfridus.nl/en
 
