@@ -1,17 +1,16 @@
-## Hi there 
-Welcome to our github profile! 
-The Robotics Werenfridus group uploads all code and instructions on here for you to download for your robot!
+## Welcome!
+Welcome to our github!
 
-How it's categorized:
+Here we store all code for our **robotics-wf**! Check out **more info** at https://roboticawerenfridus.nl/! Interested in our documentation? Check out https://docs.roboticawerenfridus.nl/en
 
--robotica: main repo containing all important stuff for the main robot model you build in the club.
+How it's **categorized can be found at** https://roboticawerenfridus.nl/github
 
--robotica-zero: repo containing old versions for pi zero (2) w.
+---
 
--robotica-beta: repo containing beta versions and experimental programs, also contains extra code for expansions to your robot.
+We use a lot of services **paid and non-paid**. *We are not a business and give no claim on things that happen with our code*
 
--robotica-ai: repo containing experimental AI programs, camera will be needed for most.
+Services list can be found at: https://roboticawerenfridus.nl/logos.svg
 
-Current code languages and services used for the club and code:
+---
 
-[![Current code languages and services used in our project:](https://roboticawerenfridus.nl/logos.svg)](https://roboticawerenfridus.nl)
+**Have fun!**
