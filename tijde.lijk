@@ -1,18 +1,20 @@
+#include <BleConnectionStatus.h>
+#include <BleGamepad.h>
+#include <BleGamepadConfiguration.h>
+#include <BleOutputReceiver.h>
+
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-#include <ESP32_BLE_Gamepad.h>  // To simulate the Xbox controller
+
+#define SERVICE_UUID "7da2db49-6bcf-4013-a7e0-bbe8c602d225"
 
 // Create BLE Gamepad object
-ESP32_BLE_Gamepad gamepad;
+BleGamepad gamepad;
 
 // Pin definitions for the buttons and joysticks (example pins)
-const int joyXPin = 34;  // Analog pin for X axis of joystick
-const int joyYPin = 35;  // Analog pin for Y axis of joystick
-const int buttonAPin = 32;  // Button A
-const int buttonBPin = 33;  // Button B
-const int buttonXPin = 25;  // Button X
-const int buttonYPin = 26;  // Button Y
+const int joyXPin = 26;  // Analog pin for X axis of joystick
+const int joyYPin = 25;  // Analog pin for Y axis of joystick
 
 void setup() {
   // Start Serial Monitor for debugging
@@ -20,18 +22,12 @@ void setup() {
   delay(1000);
 
   // Initialize BLE
-  BLEDevice::init("ESP32 Xbox Controller");  // Name of the Bluetooth device
+  BLEDevice::init("ESP32 RoboController");  // Name of the Bluetooth device
   BLEServer *pServer = BLEDevice::createServer();
   BLEService *pService = pServer->createService(SERVICE_UUID);
   
   // Initialize Gamepad
   gamepad.begin();
-
-  // Set up button pins as inputs
-  pinMode(buttonAPin, INPUT_PULLUP);
-  pinMode(buttonBPin, INPUT_PULLUP);
-  pinMode(buttonXPin, INPUT_PULLUP);
-  pinMode(buttonYPin, INPUT_PULLUP);
   
   // Set up joystick pins (you can use analogRead to get joystick values)
   pinMode(joyXPin, INPUT);
@@ -45,20 +41,8 @@ void loop() {
   int joyXValue = map(analogRead(joyXPin), 0, 4095, -128, 127);
   int joyYValue = map(analogRead(joyYPin), 0, 4095, -128, 127);
 
-  // Read button states
-  bool buttonA = !digitalRead(buttonAPin);  // Active low buttons
-  bool buttonB = !digitalRead(buttonBPin);
-  bool buttonX = !digitalRead(buttonXPin);
-  bool buttonY = !digitalRead(buttonYPin);
-
   // Send joystick values to the gamepad using setAxes (to set both X and Y at once)
   gamepad.setAxes(joyXValue, joyYValue);
-
-  // Send button presses to the gamepad
-  gamepad.setButton(0, buttonA);  // Button A
-  gamepad.setButton(1, buttonB);  // Button B
-  gamepad.setButton(2, buttonX);  // Button X
-  gamepad.setButton(3, buttonY);  // Button Y
 
   // Send updates to the gamepad
   gamepad.sendReport();
