@@ -1,0 +1,155 @@
+To set up Bluetooth communication between an **ESP32** and a **Raspberry Pi** using Bluetooth to send joystick data (X and Y coordinates), the setup will be similar to the one I described before, but with adjustments for the Raspberry Pi's Bluetooth configuration.
+
+### Overview:
+1. **ESP32 (Arduino code)**: Same as before, it will send joystick data over Bluetooth.
+2. **Raspberry Pi (Python code)**: The Raspberry Pi will receive Bluetooth data via a Bluetooth serial connection.
+
+### Step 1: Arduino Code for ESP32
+
+Here’s the same ESP32 code as before. It will send joystick X and Y coordinates over Bluetooth to the Raspberry Pi.
+
+**ESP32 Arduino Code:**
+```cpp
+#include <BluetoothSerial.h>
+
+// Create BluetoothSerial object
+BluetoothSerial ESP_BT;
+
+// Define the pins for the two joysticks
+const int joystick1_X = 34; // X axis of joystick 1
+const int joystick1_Y = 35; // Y axis of joystick 1
+const int joystick2_X = 32; // X axis of joystick 2
+const int joystick2_Y = 33; // Y axis of joystick 2
+
+void setup() {
+  // Start serial communication for debugging
+  Serial.begin(115200);
+
+  // Start Bluetooth communication
+  if (!ESP_BT.begin("ESP32_Joystick")) { // Name of the Bluetooth device
+    Serial.println("An error occurred while initializing Bluetooth");
+    return;
+  }
+
+  Serial.println("Bluetooth Initialized!");
+  Serial.println("Waiting for Bluetooth connection...");
+}
+
+void loop() {
+  // Read joystick values (0-1023)
+  int joystick1_X_value = analogRead(joystick1_X);
+  int joystick1_Y_value = analogRead(joystick1_Y);
+  int joystick2_X_value = analogRead(joystick2_X);
+  int joystick2_Y_value = analogRead(joystick2_Y);
+
+  // Send joystick data over Bluetooth in the format "x1,y1,x2,y2"
+  String data = String(joystick1_X_value) + "," + String(joystick1_Y_value) + "," + String(joystick2_X_value) + "," + String(joystick2_Y_value);
+  ESP_BT.println(data);
+
+  // Print data to the Serial Monitor for debugging
+  Serial.println(data);
+
+  // Small delay to control sending rate
+  delay(100);
+}
+```
+
+### Step 2: Set up Bluetooth on Raspberry Pi
+
+1. **Ensure Bluetooth is enabled on your Raspberry Pi**:
+   - If using Raspberry Pi OS, Bluetooth is typically enabled by default. If not, you can enable it via:
+     ```bash
+     sudo systemctl enable bluetooth
+     sudo systemctl start bluetooth
+     ```
+
+2. **Install required Bluetooth tools**:
+   Install the `bluez` package, which is the Bluetooth protocol stack for Linux, and `pyserial` for Python communication:
+   ```bash
+   sudo apt update
+   sudo apt install bluez python3-pip
+   sudo pip3 install pyserial
+   ```
+
+3. **Enable Bluetooth serial port (RFCOMM)**:
+   You need to use Bluetooth’s RFCOMM to create a serial connection. This can be done using the following steps:
+
+   - **Pair the Raspberry Pi with the ESP32**:
+     - On the Raspberry Pi, run:
+       ```bash
+       bluetoothctl
+       ```
+     - Inside the `bluetoothctl` prompt:
+       - Turn on Bluetooth if it's off: `power on`
+       - Make the Raspberry Pi discoverable: `agent on`, `discoverable on`
+       - List available devices: `scan on`
+       - Once you find your ESP32 device (it will show as `ESP32_Joystick`), pair it with:
+         ```bash
+         pair <MAC address>
+         trust <MAC address>
+         connect <MAC address>
+         ```
+       - The MAC address of the ESP32 should be visible when you list available devices.
+     - Exit `bluetoothctl` by typing `exit`.
+
+4. **Find the Serial Port**:
+   After connecting the ESP32, the Raspberry Pi will assign a Bluetooth serial port to the connection. You can check it using the command:
+   ```bash
+   ls /dev/rfcomm*
+   ```
+   It should show something like `/dev/rfcomm0`.
+
+### Step 3: Python Script to Receive Data on Raspberry Pi
+
+Now, on the Raspberry Pi, you will write a Python script to read the data from the ESP32 via Bluetooth.
+
+**Python Code to Receive Data:**
+
+```python
+import serial
+import time
+
+# Set up the serial port (use the correct RFComm port for your system, e.g., /dev/rfcomm0)
+bluetooth_port = '/dev/rfcomm0'  # This is typically the serial port created for the Bluetooth device
+baud_rate = 115200
+
+# Establish Bluetooth serial connection
+try:
+    ser = serial.Serial(bluetooth_port, baud_rate)
+    print(f"Connected to {bluetooth_port}")
+except Exception as e:
+    print(f"Could not connect to Bluetooth device: {e}")
+    exit()
+
+while True:
+    try:
+        # Read data from ESP32
+        if ser.in_waiting > 0:
+            data = ser.readline().decode('utf-8').strip()  # Read and decode the data
+            if data:
+                # Split the data into the joystick coordinates
+                x1, y1, x2, y2 = map(int, data.split(','))
+                print(f"Joystick 1: X={x1}, Y={y1}")
+                print(f"Joystick 2: X={x2}, Y={y2}")
+    except Exception as e:
+        print(f"Error reading data: {e}")
+
+    time.sleep(0.1)  # Small delay to prevent high CPU usage
+```
+
+### How It Works:
+1. **ESP32 Code**:
+   - The ESP32 reads analog values from two joysticks and sends the X and Y values over Bluetooth.
+   - It uses the Bluetooth Serial (SPP) profile to communicate with the Raspberry Pi.
+
+2. **Raspberry Pi Code**:
+   - The Raspberry Pi listens for incoming Bluetooth connections and opens a serial port (e.g., `/dev/rfcomm0`).
+   - It reads the data sent from the ESP32, splits it into X and Y coordinates for both joysticks, and prints them.
+
+### Final Notes:
+- **Bluetooth pairing**: Ensure that Bluetooth pairing is successful before starting the Python script.
+- **Device names and serial port paths**: Adjust the Bluetooth serial port path (`/dev/rfcomm0`) to match your system configuration.
+- **Serial port baud rate**: The baud rate in both the Arduino and Python script must match (115200 in this case).
+- **Testing and Debugging**: If the Raspberry Pi is not receiving data, double-check the Bluetooth connection and verify that the ESP32 is correctly sending data by checking the serial monitor.
+
+With this setup, you should be able to transmit joystick data from an ESP32 to a Raspberry Pi using Bluetooth.
